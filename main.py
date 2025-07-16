@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import csv
-from keep_alive import keep_alive
 import os
 from cabin_info import CABINS
 import asyncio
@@ -275,8 +274,6 @@ async def claimdestiny(interaction: discord.Interaction, student_number: str):
         await asyncio.sleep(10)
         await interaction.channel.delete()
 
-
-keep_alive()
 if BOT_TOKEN is None:
     raise RuntimeError("Environment variable 'BOT_TOKEN' is not set.")
 bot.run(BOT_TOKEN)
