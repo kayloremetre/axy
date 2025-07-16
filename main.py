@@ -353,7 +353,7 @@ async def consultaxy(interaction: discord.Interaction, question: str):
         color=discord.Color.purple()
     )
     embed.set_footer(text="Let no mortal question fate twice in a day.")
-    await interaction.followup.send(embed=embed, ephemeral=True)
+    await interaction.followup.send(embed=embed)
 
 keep_alive()
 
