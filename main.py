@@ -5,6 +5,7 @@ import csv
 import os
 from cabin_info import CABINS
 import asyncio
+from keep_alive import keep_alive
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 def require_env_int(var_name: str) -> int:
@@ -269,10 +270,12 @@ async def claimdestiny(interaction: discord.Interaction, student_number: str):
     if isinstance(interaction.channel, discord.Thread):
         await interaction.followup.send(
             content=
-            "🕰️ This thread will vanish in 10 seconds. The Oracle does not wait long...",
+            "🕰️ This thread of fate will vanish in 10 seconds. The Oracle does not wait long...",
             ephemeral=True)
         await asyncio.sleep(10)
         await interaction.channel.delete()
+
+keep_alive()
 
 if BOT_TOKEN is None:
     raise RuntimeError("Environment variable 'BOT_TOKEN' is not set.")
