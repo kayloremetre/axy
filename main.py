@@ -6,6 +6,7 @@ import os
 from cabin_info import CABINS
 import asyncio
 from keep_alive import keep_alive
+import requests
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 def require_env_int(var_name: str) -> int:
@@ -18,6 +19,25 @@ GUILD_ID = require_env_int('GUILD_ID')
 ROLE_ASSIGNMENT_CHANNEL = require_env_int('ROLE_ASSIGNMENT_CHANNEL')
 AXY_INTRO_CHANNEL = require_env_int('AXY_INTRO_CHANNEL')
 BOOTCAMPER_ROLE_ID = require_env_int('BOOTCAMPER_ROLE_ID')
+HF_API_TOKEN = os.getenv("HF_API_TOKEN")
+
+def query_oracle(prompt: str) -> str:
+    url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+    headers = {
+        "Authorization": f"Bearer {HF_API_TOKEN}"
+    }
+    data = {
+        "inputs": prompt,
+        "parameters": {"max_new_tokens": 150, "temperature": 0.8}
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    result = response.json()
+
+    if isinstance(result, dict) and "error" in result:
+        return "🔮 The Oracle is currently silent... try again later."
+    
+    return result[0]['generated_text'].split(prompt)[-1].strip()
 
 cabin_data = {}
 with open('cabin_assignments.csv', mode='r') as file:
@@ -264,6 +284,76 @@ async def claimdestiny(interaction: discord.Interaction, student_number: str):
             ephemeral=True)
         await asyncio.sleep(10)
         await interaction.channel.delete()
+
+from time import time
+from datetime import timedelta
+
+last_consult_time = {}
+
+@tree.command(name="consultaxy", description="Seek a cryptic prophecy from Axy, the Oracle.", guild=discord.Object(id=GUILD_ID))
+@app_commands.describe(question="Pose your fate-bound question to Axy...")
+async def consultaxy(interaction: discord.Interaction, question: str):
+    await interaction.response.defer(thinking=True, ephemeral=True)
+
+    user_id = interaction.user.id
+    now = time()
+
+    last_used = last_consult_time.get(user_id)
+    if last_used and (now - last_used) < timedelta(days=1):
+        next_time = last_used + timedelta(days=1)
+        wait_hours = int((next_time - now).total_seconds() // 3600)
+        await interaction.followup.send(
+            f"🕯 The Oracle has already spoken to you today, Haflblood.\nReturn after **{wait_hours}** hour(s) have passed.",
+            ephemeral=True
+        )
+        return
+
+    last_consult_time[user_id] = now
+
+    if isinstance(interaction.user, discord.Member):
+        member = interaction.user
+    elif interaction.guild is not None:
+        member = await interaction.guild.fetch_member(interaction.user.id)
+    else:
+        await interaction.followup.send(
+            "⚠️ This command must be used within a server, not in DMs.",
+            ephemeral=True
+        )
+        return
+    member_roles = [r.id for r in member.roles]
+    cabin_name = None
+
+    for name, meta in CABINS.items():
+        if meta['role_id'] in member_roles:
+            cabin_name = name
+            break
+
+    # Build prompt
+    if cabin_name:
+        prompt = (
+            f"You are Axy, an ancient prophetic Oracle of Olympus. "
+            f"Speak to a halfblood from the cabin of {cabin_name}. "
+            f"Their question is: '{question}'. "
+            f"Give a short, poetic, cryptic prophecy referencing {cabin_name}'s mythos and/or Greek mythos. "
+            f"Refer to them as a Halfblood, and end with a blessing or warning."
+        )
+    else:
+        prompt = (
+            f"You are Axy, a timeless Oracle of Olympus. A Halfblood seeks wisdom. "
+            f"Their question is: '{question}'. "
+            f"Give a short, mythical prophecy for an unclaimed soul. "
+            f"Speak as if fate has yet to decide their path."
+        )
+
+    reply = query_oracle(prompt)
+
+    embed = discord.Embed(
+        title="🔮 The Oracle Speaks...",
+        description=f"*{reply}*",
+        color=discord.Color.purple()
+    )
+    embed.set_footer(text="Let no mortal question fate twice in a day.")
+    await interaction.followup.send(embed=embed, ephemeral=True)
 
 keep_alive()
 
