@@ -1,64 +1,65 @@
 import discord
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, Embed
 import csv
 import os
 from cabin_info import CABINS
 import asyncio
 from keep_alive import keep_alive
 import requests
+import json
 
-BOT_TOKEN = os.getenv('BOT_TOKEN')
 def require_env_int(var_name: str) -> int:
     value = os.getenv(var_name)
     if value is None:
         raise RuntimeError(f"Environment variable '{var_name}' is not set.")
     return int(value)
 
-GUILD_ID = require_env_int('GUILD_ID')
-ROLE_ASSIGNMENT_CHANNEL = require_env_int('ROLE_ASSIGNMENT_CHANNEL')
+def require_env_str(var_name: str) -> str:
+    value = os.getenv(var_name)
+    if value is None:
+        raise RuntimeError(f"Environment variable '{var_name}' is not set.")
+    return value
+
 AXY_INTRO_CHANNEL = require_env_int('AXY_INTRO_CHANNEL')
+ROLE_ASSIGNMENT_CHANNEL = require_env_int('ROLE_ASSIGNMENT_CHANNEL')
 BOOTCAMPER_ROLE_ID = require_env_int('BOOTCAMPER_ROLE_ID')
-HF_API_TOKEN = os.getenv("HF_API_TOKEN")
+BOT_TOKEN = require_env_str('BOT_TOKEN')
+GUILD_ID = require_env_int('GUILD_ID')
+OPENROUTER_API_KEY = require_env_str('OPENROUTER_API_KEY')
 
-import requests
+def generate_oracle_reply(question, user_cabin=None):
+    system_prompt = (
+        f"You are Axy, a cute axolotl, the ancient Oracle of Olympus, a cryptic prophet who speaks in riddles and myth. "
+        f"Respond like a poetic, enigmatic divine being.\n"
+        f"User is {'a child of ' + user_cabin if user_cabin else 'a wandering halfblood'} seeking their fate."
+    )
 
-HF_API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct"
-HF_API_KEY = os.getenv("HF_API_KEY")
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+    }
 
-headers = {
-    "Authorization": f"Bearer {HF_API_KEY}",
-    "Content-Type": "application/json"
-}
-
-def query_oracle(prompt: str) -> str:
     payload = {
-        "inputs": prompt,
-        "parameters": {
-            "max_new_tokens": 120,
-            "temperature": 0.85,
-            "top_p": 0.9,
-            "repetition_penalty": 1.1,
-            "do_sample": True,
-        }
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": question}
+        ]
     }
 
     try:
-        response = requests.post(HF_API_URL, headers=headers, json=payload, timeout=30)
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions",
+                                 headers=headers,
+                                 data=json.dumps(payload))
         response.raise_for_status()
-        result = response.json()
+        data = response.json()
 
-        if isinstance(result, list) and "generated_text" in result[0]:
-            return result[0]["generated_text"].split("\n")[-1].strip()
-        elif isinstance(result, dict) and "generated_text" in result:
-            return result["generated_text"].split("\n")[-1].strip()
-        else:
-            return "🜸 The Oracle whispers nothing... silence reigns for now."
+        return data["choices"][0]["message"]["content"].strip()
 
     except Exception as e:
-        print(f"HF API error: {e}")
-        return "🜸 The mists cloud the Oracle’s vision. Try again later."
-
+        print("❌ Axy API Error:", e)
+        return "⚠️ The Oracle remains silent for now..."
 
 cabin_data = {}
 with open('cabin_assignments.csv', mode='r') as file:
@@ -249,8 +250,13 @@ async def claimdestiny(interaction: discord.Interaction, student_number: str):
 
     if isinstance(interaction.user, discord.Member):
         member = interaction.user
-    else:
+    elif interaction.guild is not None:
         member = await interaction.guild.fetch_member(interaction.user.id)
+    else:
+        await interaction.response.send_message(
+            content="⚠️ This command must be used within a server, not in DMs.",
+            ephemeral=True)
+        return
 
     all_cabin_role_ids = set(meta['role_id'] for meta in CABINS.values())
 
@@ -313,64 +319,56 @@ last_consult_time = {}
 @tree.command(name="consultaxy", description="Seek a cryptic prophecy from Axy, the Oracle.", guild=discord.Object(id=GUILD_ID))
 @app_commands.describe(question="Pose your fate-bound question to Axy...")
 async def consultaxy(interaction: discord.Interaction, question: str):
-    try:
-        await interaction.response.defer(thinking=True, ephemeral=True)
+    await interaction.response.defer(thinking=True, ephemeral=True)
 
-        user_id = interaction.user.id
-        now = datetime.now(timezone.utc)
+    user_id = interaction.user.id
+    now = datetime.now(timezone.utc)
 
-        last_used = last_consult_time.get(user_id)
-        if last_used and (now - last_used) < timedelta(days=1):
-            remaining = timedelta(days=1) - (now - last_used)
-            hours, remainder = divmod(remaining.total_seconds(), 3600)
-            minutes, _ = divmod(remainder, 60)
-
-            await interaction.followup.send(
-                f"🕯 The Oracle has already whispered to you today, Halfblood.\n"
-                f"Return in **{int(hours)}** hour(s) and **{int(minutes)}** minute(s).",
-                ephemeral=True
-            )
-            return
-
-        last_consult_time[user_id] = now
-
-        # Ensure member is a discord.Member, not discord.User
-        if isinstance(interaction.user, discord.Member):
-            member = interaction.user
-        elif interaction.guild is not None:
-            member = await interaction.guild.fetch_member(interaction.user.id)
-        else:
-            await interaction.followup.send("⚠️ This command must be used within a server, not in DMs.", ephemeral=True)
-            return
-        member_roles = [r.id for r in member.roles]
-        cabin_name = next((name for name, meta in CABINS.items() if meta['role_id'] in member_roles), None)
-
-        if cabin_name:
-            prompt = (
-                f"You are Axy, a cute axolotl, Oracle of Olympus. A demigod from the {cabin_name} cabin asks: “{question}” "
-                f"Give a short, mythic prophecy referencing {cabin_name} lore. End with a cryptic warning or blessing."
-            )
-        else:
-            prompt = (
-                f"You are Axy, a cute axolotl, Oracle of Olympus. A halfblood without a known lineage asks: “{question}” "
-                f"Respond with a vague prophecy hinting at future trials, and speak mysteriously."
-            )
-
-        response = query_oracle(prompt)  # Replace with actual HuggingFace/text-gen call
-
-        embed = discord.Embed(
-            title="🔮 The Oracle Speaks...",
-            description=f"*{response}*",
-            color=discord.Color.purple()
+    last_used = last_consult_time.get(user_id)
+    if last_used and (now - last_used) < timedelta(days=0.5):
+        wait_hours = int((last_used + timedelta(days=0.5) - now).total_seconds() // 3600)
+        await interaction.followup.send(
+            f"🕯 The Oracle has already spoken to you today, Halfblood.\nReturn after **{wait_hours}** hour(s).",
+            ephemeral=True
         )
-        embed.set_footer(text="The stars shall not answer again until the morrow.")
+        return
 
-        await interaction.followup.send(embed=embed)
+    if isinstance(interaction.user, discord.Member):
+        member = interaction.user
+    elif interaction.guild is not None:
+        member = await interaction.guild.fetch_member(interaction.user.id)
+    else:
+        await interaction.followup.send("⚠️ This command must be used within a server, not in DMs.", ephemeral=True)
+        return
 
+    user_roles = member.roles
+    user_cabin = None
+    for cabin_name, meta in CABINS.items():
+        if any(role.id == meta['role_id'] for role in user_roles):
+            user_cabin = cabin_name
+            break
+
+    try:
+        oracle_reply = generate_oracle_reply(question, user_cabin=user_cabin)
     except Exception as e:
-        print(f"Error in /consultaxy: {e}")
-        await interaction.followup.send("⚠️ A crack in fate has occurred. Try again later.", ephemeral=True)
+        await interaction.followup.send(f"⚠️ Axy failed to respond: {e}", ephemeral=True)
+        return
 
+    last_consult_time[user_id] = now
+
+    embed = Embed(
+    title="🔮 The Oracle Murmurs in the Void...",
+    description=(
+        f"Halfblood **{member.display_name}**, your voice echoes across the Threads of Fate...\n"
+        f"_You asked:_\n"
+        f"“*{question}*”\n\n"
+        f"The starlit waters ripple. Axy gazes beyond the veil, and answers:\n"
+        f"➤ *\"{oracle_reply}\"*"
+    ),
+    color=0x8F5FE8
+)
+    embed.set_footer(text="The winds quiet... the Oracle returns to silence.")
+    await interaction.followup.send(embed=embed)
 
 keep_alive()
 
