@@ -306,7 +306,7 @@ async def claimdestiny(interaction: discord.Interaction, student_number: str):
         await asyncio.sleep(10)
         await interaction.channel.delete()
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 last_consult_time = {}
 
@@ -314,17 +314,20 @@ last_consult_time = {}
 @app_commands.describe(question="Pose your fate-bound question to Axy...")
 async def consultaxy(interaction: discord.Interaction, question: str):
     try:
-        # Immediately defer to keep interaction alive
         await interaction.response.defer(thinking=True, ephemeral=True)
 
         user_id = interaction.user.id
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
 
         last_used = last_consult_time.get(user_id)
         if last_used and (now - last_used) < timedelta(days=1):
-            wait_hours = int((last_used + timedelta(days=1) - now).total_seconds() // 3600)
+            remaining = timedelta(days=1) - (now - last_used)
+            hours, remainder = divmod(remaining.total_seconds(), 3600)
+            minutes, _ = divmod(remainder, 60)
+
             await interaction.followup.send(
-                f"🕯 The Oracle has already spoken to you today, Seeker.\nReturn after **{wait_hours}** hour(s).",
+                f"🕯 The Oracle has already whispered to you today, Seeker.\n"
+                f"Return in **{int(hours)}** hour(s) and **{int(minutes)}** minute(s).",
                 ephemeral=True
             )
             return
