@@ -19,7 +19,6 @@ ROLE_ASSIGNMENT_CHANNEL = require_env_int('ROLE_ASSIGNMENT_CHANNEL')
 AXY_INTRO_CHANNEL = require_env_int('AXY_INTRO_CHANNEL')
 BOOTCAMPER_ROLE_ID = require_env_int('BOOTCAMPER_ROLE_ID')
 
-# Load cabin assignments from CSV into dictionary
 cabin_data = {}
 with open('cabin_assignments.csv', mode='r') as file:
     reader = csv.DictReader(file)
@@ -28,7 +27,6 @@ with open('cabin_assignments.csv', mode='r') as file:
         cabin = row['Cabin'].strip()
         cabin_data[student_number] = cabin
 
-# Set up bot with necessary intents
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
@@ -56,7 +54,7 @@ class ClaimButton(discord.ui.View):
             return
 
         thread = await interaction.channel.create_thread(
-            name=f"thread-of-fate-{member.name}",
+            name=f"Thread of Fate - {member.name}",
             type=discord.ChannelType.private_thread,
             invitable=False)
         thread: discord.Thread = thread
@@ -66,7 +64,6 @@ class ClaimButton(discord.ui.View):
         except discord.Forbidden:
             print(f"❌ Could not add {member} to thread (missing permissions).")
 
-        # 📜 Worldbuilding embed
         embed = discord.Embed(
             title="You Have Entered Your Thread of Fate",
             description=
@@ -85,14 +82,11 @@ class ClaimButton(discord.ui.View):
 
         embed.set_thumbnail(url=member.display_avatar.url)
 
-        # Send embed in thread
         await thread.send(embed=embed)
 
-        # Ephemeral notice in main channel
         await interaction.response.send_message(
             "🔮 A thread has been opened with the Oracle.", ephemeral=True)
 
-        # Wait 60 seconds and delete the thread
         await asyncio.sleep(60)
         await thread.send(
             f"⚠️ This thread will vanish in 60 seconds. Claim your destiny swiftly, halfblood {member.mention}..."
@@ -111,7 +105,7 @@ async def on_ready():
     print(f'Logged in as {bot.user}')
     await tree.sync(guild=discord.Object(id=GUILD_ID))
 
-    bot.add_view(ClaimButton())  # Register persistent view
+    bot.add_view(ClaimButton())
     print("Persistent views registered")
 
     # await send_axy_intro(bot)
@@ -162,7 +156,6 @@ async def send_axy_intro(bot: discord.Client):
         "https://media.discordapp.net/attachments/1394946325161709699/1394956246670508092/BC12_Embed_Banners1.png?ex=6878b1be&is=6877603e&hm=4bfd114d8aff824212f272f176271fb1a6bd1b18a233821a268f0b2a629b8e1f&=&format=webp&quality=lossless"
     )
 
-    # Only send if the channel supports send (i.e., is a TextChannel)
     if isinstance(channel, discord.TextChannel):
         await channel.send(embed=embed, view=ClaimButton())
     else:
@@ -177,7 +170,7 @@ async def claimdestiny(interaction: discord.Interaction, student_number: str):
     if not isinstance(interaction.channel, discord.Thread
                       ) or interaction.channel.parent_id != AXY_INTRO_CHANNEL:
         await interaction.response.send_message(
-            "⚠️ You may only commune with the Oracle inside your private thread — not in the public halls.",
+            "⚠️ You may only commune with the Oracle inside your private thread of fate — not in the mortal halls.",
             ephemeral=True)
         return
 
@@ -213,7 +206,6 @@ async def claimdestiny(interaction: discord.Interaction, student_number: str):
             ephemeral=True)
         return
 
-    # Ensure member is a discord.Member, not just a discord.User
     if isinstance(interaction.user, discord.Member):
         member = interaction.user
     else:
@@ -253,14 +245,12 @@ async def claimdestiny(interaction: discord.Interaction, student_number: str):
     embed.set_footer(text='Prepare, for your odyssey is about to unfold.')
     embed.set_thumbnail(url=member.display_avatar.url)
 
-    # Send prophecy publicly in the role assignment channel
     public_channel = interaction.guild.get_channel(ROLE_ASSIGNMENT_CHANNEL)
     if isinstance(public_channel, discord.TextChannel):
         await public_channel.send(embed=embed)
     else:
         print(f"❌ Channel {public_channel} does not support sending messages (type: {type(public_channel)}).")
 
-    # Send confirmation to the user (ephemeral)
     channel_mention = f"<#{ROLE_ASSIGNMENT_CHANNEL}>"
     await interaction.response.send_message(content=(
         f"🔓 Your fate has been revealed in the **Great Hall**: {channel_mention}.\n"
