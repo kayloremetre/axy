@@ -319,7 +319,7 @@ last_consult_time = {}
 @tree.command(name="consultaxy", description="Seek a cryptic prophecy from Axy, the Oracle.", guild=discord.Object(id=GUILD_ID))
 @app_commands.describe(question="Pose your fate-bound question to Axy...")
 async def consultaxy(interaction: discord.Interaction, question: str):
-    await interaction.response.defer(thinking=True, ephemeral=True)
+    await interaction.response.defer(thinking=True)
 
     user_id = interaction.user.id
     now = datetime.now(timezone.utc)
