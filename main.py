@@ -359,15 +359,15 @@ async def consultaxy(interaction: discord.Interaction, question: str):
     embed = Embed(
     title="🔮 The Oracle Murmurs in the Void...",
     description=(
-        f"Halfblood **{member.display_name}**, your voice echoes across the Threads of Fate...\n"
-        f"_You asked:_\n"
-        f"“*{question}*”\n\n"
-        f"The starlit waters ripple. Axy gazes beyond the veil, and answers:\n"
-        f"➤ *\"{oracle_reply}\"*"
+        f"Halfblood **{member.mention}**, your voice echoes across the Threads of Fate...\n"
+        f"_You asked: “*{question}*”_\n\n"
+        f"**The starlit waters ripple. Axy gazes beyond the veil, and answers:**\n"
+        f"*\"{oracle_reply}\"*"
     ),
     color=0x8F5FE8
 )
     embed.set_footer(text="The winds quiet... the Oracle returns to silence.")
+    embed.set_thumbnail(url=member.display_avatar.url)
     await interaction.followup.send(embed=embed)
 
 keep_alive()
