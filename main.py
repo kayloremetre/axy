@@ -326,7 +326,7 @@ async def consultaxy(interaction: discord.Interaction, question: str):
             minutes, _ = divmod(remainder, 60)
 
             await interaction.followup.send(
-                f"🕯 The Oracle has already whispered to you today, Seeker.\n"
+                f"🕯 The Oracle has already whispered to you today, Halfblood.\n"
                 f"Return in **{int(hours)}** hour(s) and **{int(minutes)}** minute(s).",
                 ephemeral=True
             )
