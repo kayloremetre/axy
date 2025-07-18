@@ -142,6 +142,71 @@ class ClaimButton(discord.ui.View):
         except discord.Forbidden:
             print(f"❌ Lacking permissions to delete thread {thread.name}.")
 
+class OracleBookView(discord.ui.View):
+    def __init__(self, user: discord.User, start_page: int = 0):
+        super().__init__(timeout=300)
+        self.user = user
+        self.page = start_page
+        self.message = None
+        self.add_item(self.PageDropdown(self))  # Add dropdown to view
+
+    def create_embed(self):
+        page = guide_pages[self.page]
+        embed = discord.Embed(title=page["title"], color=0xD4AF37)
+        embed.set_image(url=page["image"])
+        embed.set_footer(text=f"Page {self.page + 1} of {len(guide_pages)}")
+        return embed
+
+    async def update_page(self, interaction: discord.Interaction):
+        if interaction.user.id != self.user.id:
+            await interaction.response.send_message("❌ You cannot control another demigod’s scroll.", ephemeral=True)
+            return
+        embed = self.create_embed()
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    @discord.ui.button(label="◀️ Back", style=ButtonStyle.primary, row=0)
+    async def back(self, interaction: discord.Interaction, button: Button):
+        if self.page > 0:
+            self.page -= 1
+        await self.update_page(interaction)
+
+    @discord.ui.button(label="▶️ Next", style=ButtonStyle.primary, row=0)
+    async def next(self, interaction: discord.Interaction, button: Button):
+        if self.page < len(guide_pages) - 1:
+            self.page += 1
+        await self.update_page(interaction)
+
+    class PageDropdown(discord.ui.Select):
+        def __init__(self, parent_view: 'OracleBookView'):
+            self.parent_view = parent_view
+
+            options = [
+                discord.SelectOption(
+                    label=f"{i+1}. {page['title']}",
+                    value=str(i),
+                    emoji=page['title'].split()[2] if len(page['title'].split()) > 2 else None  # Extract emoji
+                )
+                for i, page in enumerate(guide_pages)
+            ]
+
+            super().__init__(
+                placeholder="📖 Jump to page…",
+                min_values=1,
+                max_values=1,
+                options=options
+            )
+
+        async def callback(self, interaction: discord.Interaction):
+            if interaction.user.id != self.parent_view.user.id:
+                await interaction.response.send_message(
+                    "❌ Only the one who summoned the Oracle may flip the scroll.",
+                    ephemeral=True
+                )
+                return
+
+            self.parent_view.page = int(self.values[0])
+            await self.parent_view.update_page(interaction)
+
 
 @bot.event
 async def on_ready():
@@ -149,7 +214,6 @@ async def on_ready():
     await tree.sync(guild=discord.Object(id=GUILD_ID))
 
     bot.add_view(ClaimButton())
-    bot.add_view(GuidebookView())
     print("Persistent views registered")
 
 async def send_axy_intro(bot: discord.Client):
@@ -201,7 +265,6 @@ async def send_axy_intro(bot: discord.Client):
         await channel.send(embed=embed, view=ClaimButton())
     else:
         print(f"❌ Channel {channel} does not support sending messages (type: {type(channel)}).")
-
 
 @tree.command(name="claimdestiny",
               description="Reveal your cabin by entering your student number.",
@@ -388,67 +451,14 @@ guide_pages = [
     # Add more gods here...
 ]
 
-class GuidebookView(View):
-    def __init__(self):
-        self.page = 0  # Make sure this comes BEFORE super().__init__()
-        self.message = None
-        super().__init__(timeout=600)  # or timeout=None if you want it persistent
+@bot.tree.command(name="oraclebook", description="Flip through the Oracle’s guidebook.", guild=discord.Object(id=GUILD_ID))
+async def oraclebook(interaction: discord.Interaction):
+    await interaction.response.defer(thinking=True, ephemeral=False)
 
-    async def update_embed(self, interaction: Interaction):
-        page_data = guide_pages[self.page]
-        embed = Embed(
-            title=page_data["title"],
-            description="📚 Navigate the divine pages of the Guidebook.",
-            color=0xD4AF37
-        )
-        embed.set_image(url=page_data["image"])
-        await interaction.response.edit_message(embed=embed, view=self)
+    view = OracleBookView(interaction.user)
+    embed = view.create_embed()
 
-    async def disable_all(self, interaction: Interaction | None = None):
-        for item in self.children:
-            if isinstance(item, Button):
-                item.disabled = True
-
-        try:
-            if self.message:
-                await self.message.edit(view=self)
-            elif interaction:
-                await interaction.edit_original_response(view=self)
-        except Exception:
-            pass
-
-    async def on_timeout(self):
-        await self.disable_all()
-
-    @button(label="⏮", style=ButtonStyle.secondary)
-    async def previous(self, interaction: Interaction, button: Button):
-        self.page = (self.page - 1) % len(guide_pages)
-        await self.update_embed(interaction)
-
-    @button(label="⏭", style=ButtonStyle.secondary)
-    async def next(self, interaction: Interaction, button: Button):
-        self.page = (self.page + 1) % len(guide_pages)
-        await self.update_embed(interaction)
-
-    @button(label="📖 First Page", style=ButtonStyle.primary)
-    async def first(self, interaction: Interaction, button: Button):
-        self.page = 0
-        await self.update_embed(interaction)
-
-@bot.tree.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.", guild=discord.Object(id=GUILD_ID))
-async def guidebook(interaction: Interaction):
-    await interaction.response.defer(thinking=True)  # Prevents the 3-second timeout
-    first_page = guide_pages[0]
-    embed = Embed(
-        title=first_page["title"],
-        description="📚 Navigate the divine pages of the Guidebook.",
-        color=0xD4AF37
-    )
-    embed.set_image(url=first_page["image"])
-
-    view = GuidebookView()
-    await interaction.response.send_message(embed=embed, view=view)
-    view.message = await interaction.original_response()
+    await interaction.followup.send(embed=embed, view=view)
 
 keep_alive()
 
