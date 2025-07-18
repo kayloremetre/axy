@@ -8,7 +8,13 @@ import asyncio
 from keep_alive import keep_alive
 import requests
 import json
+
 import logging
+
+logging.basicConfig(
+    level=logging.INFO,  # Or DEBUG for even more logs
+    format='[%(asctime)s] [%(levelname)s] %(message)s',
+)
 
 def require_env_int(var_name: str) -> int:
     value = os.getenv(var_name)
@@ -426,7 +432,7 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
     logging.error(f"Command error in {interaction.command.name}: {error}", exc_info=True)
 
 keep_alive()
-
+logging.info("Starting the bot...")
 if BOT_TOKEN is None:
     raise RuntimeError("Environment variable 'BOT_TOKEN' is not set.")
 bot.run(BOT_TOKEN)
