@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
-from discord import app_commands, Embed, Interaction, ButtonStyle
-from discord.ui import View, button, Button
+from discord import app_commands, Embed
 import csv
 import os
 from cabin_info import CABINS
@@ -9,6 +8,7 @@ import asyncio
 from keep_alive import keep_alive
 import requests
 import json
+import logging
 
 def require_env_int(var_name: str) -> int:
     value = os.getenv(var_name)
@@ -413,13 +413,17 @@ async def viewfate(interaction: discord.Interaction, god: str = None):
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user}')
+    logging.info(f'Logged in as {bot.user}')
     synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-    print(f"🔧 Synced {len(synced)} slash commands to guild {GUILD_ID}")
+    logging.info(f"🔧 Synced {len(synced)} slash commands to guild {GUILD_ID}")
     await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="the Threads of Fate... 🔮"))
     bot.add_view(ClaimButton())
-    print("Persistent views registered")
+    logging.info("Persistent views registered")
+    
+@bot.tree.error
+async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+    logging.error(f"Command error in {interaction.command.name}: {error}", exc_info=True)
 
 keep_alive()
 
