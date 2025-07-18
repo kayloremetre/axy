@@ -436,6 +436,7 @@ class GuidebookView(View):
 
 @bot.tree.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.", guild=discord.Object(id=GUILD_ID))
 async def guidebook(interaction: Interaction):
+    await interaction.response.defer(thinking=True)  # Prevents the 3-second timeout
     first_page = guide_pages[0]
     embed = Embed(
         title=first_page["title"],
