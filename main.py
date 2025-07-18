@@ -211,8 +211,14 @@ class OracleBookView(discord.ui.View):
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
-    await tree.sync(guild=discord.Object(id=GUILD_ID))
-
+    await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+    
+    # Set custom activity
+    # await bot.change_presence(activity=discord.Game(name="🜸 Awaiting Bootcamp 12.0..."))
+    # Alternatives:
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="the Threads of Fate..."))
+    # await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="half-bloods arrive..."))
+    
     bot.add_view(ClaimButton())
     print("Persistent views registered")
 
@@ -266,7 +272,7 @@ async def send_axy_intro(bot: discord.Client):
     else:
         print(f"❌ Channel {channel} does not support sending messages (type: {type(channel)}).")
 
-@tree.command(name="claimdestiny",
+@bot.tree.command(name="claimdestiny",
               description="Reveal your cabin by entering your student number.",
               guild=discord.Object(id=GUILD_ID))
 @app_commands.describe(student_number="Your UP student number")
@@ -378,7 +384,7 @@ from datetime import datetime, timedelta, timezone
 
 last_consult_time = {}
 
-@tree.command(name="consultaxy", description="Seek a cryptic prophecy from Axy, the Oracle.", guild=discord.Object(id=GUILD_ID))
+@bot.tree.command(name="consultaxy", description="Seek a cryptic prophecy from Axy, the Oracle.", guild=discord.Object(id=GUILD_ID))
 @app_commands.describe(question="Pose your fate-bound question to Axy...")
 async def consultaxy(interaction: discord.Interaction, question: str):
     await interaction.response.defer(thinking=True)
