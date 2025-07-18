@@ -393,9 +393,8 @@ guide_pages = [
 
 class GuidebookView(View):
     def __init__(self):
-        super().__init__(timeout=60)  # 1 minute timeout
-        self.page = 0
-        self.message = None  # Add this attribute to avoid assignment error
+        super().__init__(timeout=None)  # Make it persistent
+        self.add_item(Button(label="Open Guidebook", style=discord.ButtonStyle.primary, custom_id="open_guidebook"))
 
     async def disable_all(self, interaction: Interaction):
         for item in self.children:
