@@ -149,6 +149,7 @@ async def on_ready():
     await tree.sync(guild=discord.Object(id=GUILD_ID))
 
     bot.add_view(ClaimButton())
+    bot.add_view(GuidebookView())
     print("Persistent views registered")
 
 async def send_axy_intro(bot: discord.Client):
