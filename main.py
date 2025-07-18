@@ -149,6 +149,7 @@ async def on_ready():
     await tree.sync(guild=discord.Object(id=GUILD_ID))
 
     bot.add_view(ClaimButton())
+    bot.add_view(GuidebookView())
     print("Persistent views registered")
 
 async def send_axy_intro(bot: discord.Client):
@@ -389,14 +390,10 @@ guide_pages = [
 
 class GuidebookView(View):
     def __init__(self):
-        super().__init__(timeout=None)  # Make it persistent
+        super().__init__(timeout=None)  # Auto-disable after 10 minutes
+        self.page = 0
+        self.message = None  # Will be assigned after sending
         self.add_item(Button(label="Open Guidebook", style=discord.ButtonStyle.primary, custom_id="open_guidebook"))
-
-    async def disable_all(self, interaction: Interaction):
-        for item in self.children:
-            if isinstance(item, Button):
-                item.disabled = True
-        await interaction.edit_original_response(view=self)
 
     async def update_embed(self, interaction: Interaction):
         page_data = guide_pages[self.page]
@@ -407,6 +404,22 @@ class GuidebookView(View):
         )
         embed.set_image(url=page_data["image"])
         await interaction.response.edit_message(embed=embed, view=self)
+
+    async def disable_all(self, interaction: Interaction | None = None):
+        for item in self.children:
+            if isinstance(item, Button):
+                item.disabled = True
+
+        try:
+            if self.message:
+                await self.message.edit(view=self)
+            elif interaction:
+                await interaction.edit_original_response(view=self)
+        except Exception:
+            pass
+
+    async def on_timeout(self):
+        await self.disable_all()
 
     @button(label="⏮", style=ButtonStyle.secondary)
     async def previous(self, interaction: Interaction, button: Button):
@@ -422,16 +435,7 @@ class GuidebookView(View):
     async def first(self, interaction: Interaction, button: Button):
         self.page = 0
         await self.update_embed(interaction)
-
-        for item in self.children:
-            if isinstance(item, Button):
-                item.disabled = True
-        # Because timeout does not have access to interaction, we need to store the message
-        try:
-            if self.message is not None and hasattr(self.message, "edit"):
-                await self.message.edit(view=self)
-        except Exception:
-            pass
+        await self.disable_all(interaction)
 
 @bot.tree.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.", guild=discord.Object(id=GUILD_ID))
 async def guidebook(interaction: Interaction):
