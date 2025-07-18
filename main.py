@@ -390,10 +390,9 @@ guide_pages = [
 
 class GuidebookView(View):
     def __init__(self):
-        super().__init__(timeout=None)  # Auto-disable after 10 minutes
-        self.page = 0
-        self.message = None  # Will be assigned after sending
-        self.add_item(Button(label="Open Guidebook", style=discord.ButtonStyle.primary, custom_id="open_guidebook"))
+        self.page = 0  # Make sure this comes BEFORE super().__init__()
+        self.message = None
+        super().__init__(timeout=600)  # or timeout=None if you want it persistent
 
     async def update_embed(self, interaction: Interaction):
         page_data = guide_pages[self.page]
@@ -436,6 +435,7 @@ class GuidebookView(View):
         self.page = 0
         await self.update_embed(interaction)
         await self.disable_all(interaction)
+
 
 @bot.tree.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.", guild=discord.Object(id=GUILD_ID))
 async def guidebook(interaction: Interaction):
