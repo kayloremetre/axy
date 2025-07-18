@@ -439,7 +439,7 @@ class GuidebookView(View):
 
 @tree.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.")
 async def guidebook(interaction: Interaction):
-    view = GuidebookView()
+    view = GuidebookView(timeout=300)
     first_page = guide_pages[0]
     embed = Embed(
         title=first_page["title"],
