@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
-from discord import app_commands, Embed
+from discord import app_commands, Embed, Interaction, ButtonStyle
+from discord.ui import View, button, Button
 import csv
 import os
 from cabin_info import CABINS
@@ -149,6 +150,7 @@ async def on_ready():
 
     bot.add_view(ClaimButton())
     print("Persistent views registered")
+    bot.add_view(GuidebookView())
 
     # await send_axy_intro(bot)
 
@@ -369,6 +371,86 @@ async def consultaxy(interaction: discord.Interaction, question: str):
     embed.set_footer(text="The winds quiet... the Oracle returns to silence.")
     embed.set_thumbnail(url=member.display_avatar.url)
     await interaction.followup.send(embed=embed)
+
+# Example guidebook pages — update these with actual image URLs or file paths
+guide_pages = [
+    {"title": "📖 Gods of Olympus", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593993441513614/1.png?ex=687b03b0&is=6879b230&hm=ce9adedcbd50d521a27d6416289fa9400b906860aadfa8e3d05284e76abe7ea2&=&format=webp&quality=lossless&width=1546&height=902"},
+    {"title": "📜 Table of Contents", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593774540783767/2.png?ex=687b037c&is=6879b1fc&hm=4fb28f0ad5c5388941264ced741c8c322cfab026f21f464edd487ed13589f23e&=&format=webp&quality=lossless&width=1545&height=901"},
+    {"title": "I - ⚡ Zeus", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593775350415401/3.png?ex=687b037c&is=6879b1fc&hm=c16a9e513ebf25af31a1311f5f92e800710d2f0444de499ec64e6b8028718a03&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "II - 🌊 Poseidon", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593776235286568/4.png?ex=687b037d&is=6879b1fd&hm=075754ae31ea789b6c6ed79a76754233bb58f7b085555ef79d5a6dd0a4de7731&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "III - 🔥 Hades", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593777208623104/5.png?ex=687b037d&is=6879b1fd&hm=c2b85934177e89ed1f418a6718d92a9484326039e025e58c5e80dc4be1c3f134&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "IV - 🧠 Athena", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593778269519892/6.png?ex=687b037d&is=6879b1fd&hm=7b56e18c3db6c2bff60292e6e90d8bb37d9826884a18f6c6dd8488f212adb308&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "V - ⚔️ Ares", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593773609783357/7.png?ex=687b037c&is=6879b1fc&hm=1b96cdcc467c2c91b96bf136dbe71d017977b6dde2c27f6a8fd37a4e7d36a4b5&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "VI - ☀️ Apollo", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593793696170175/8.png?ex=687b0381&is=6879b201&hm=024d3e074f2c4e69da2009bd6640302807f98d1c0cca5e9e59af1e1e05470d6f&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "VII - 🌿 Demeter", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593794740683044/9.png?ex=687b0381&is=6879b201&hm=f7e08ce95e0570b16a02eda9c8d013a5ba390fc97a7671e0b6b7a29f28b81456&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "VIII - 🕊️ Hermes", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593795764097156/10.png?ex=687b0381&is=6879b201&hm=d94c804154c04ef8c2e5b8f2a91786daf49f26cc20262f8c11e44843650a518c&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "IX - 🛡️ Hephaestus", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593796779114609/11.png?ex=687b0382&is=6879b202&hm=728401e1adda1a6e306b514ce5be8021ca8a99e82bf927affd7f34fde144ffc4&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "X - 🌙 Artemis", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593797811048508/12.png?ex=687b0382&is=6879b202&hm=6f84d207f693f4c1d9b18423af1d24b89b4589b1543161c4101be22549e82089&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "XI - 💖 Aphrodite", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593798846906408/13.png?ex=687b0382&is=6879b202&hm=7ac2fcd12136a3022cbd33e0f1364910b7b3c54bac659b2339aac6ba1a4999f6&=&format=webp&quality=lossless&width=1031&height=902"},
+    {"title": "XII - 🍷 Dionysus", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593799845023764/14.png?ex=687b0382&is=6879b202&hm=1983305c8c45db82f808d8c0a501c1f41771b3f8176b216c4209a8aec87c56ed&=&format=webp&quality=lossless&width=1031&height=902"},
+    # Add more gods here...
+]
+
+class GuidebookView(View):
+    def __init__(self):
+        super().__init__(timeout=60)  # 1 minute timeout
+        self.page = 0
+        self.message = None  # Add this attribute to avoid assignment error
+
+    async def disable_all(self, interaction: Interaction):
+        for item in self.children:
+            if isinstance(item, Button):
+                item.disabled = True
+        await interaction.edit_original_response(view=self)
+
+    async def update_embed(self, interaction: Interaction):
+        page_data = guide_pages[self.page]
+        embed = Embed(
+            title=page_data["title"],
+            description="📚 Navigate the divine pages of the Guidebook.",
+            color=0xD4AF37
+        )
+        embed.set_image(url=page_data["image"])
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    @button(label="⏮", style=ButtonStyle.secondary)
+    async def previous(self, interaction: Interaction, button: Button):
+        self.page = (self.page - 1) % len(guide_pages)
+        await self.update_embed(interaction)
+
+    @button(label="⏭", style=ButtonStyle.secondary)
+    async def next(self, interaction: Interaction, button: Button):
+        self.page = (self.page + 1) % len(guide_pages)
+        await self.update_embed(interaction)
+
+    @button(label="📖 First Page", style=ButtonStyle.primary)
+    async def first(self, interaction: Interaction, button: Button):
+        self.page = 0
+        await self.update_embed(interaction)
+
+        for item in self.children:
+            if isinstance(item, Button):
+                item.disabled = True
+        # Because timeout does not have access to interaction, we need to store the message
+        try:
+            if self.message is not None and hasattr(self.message, "edit"):
+                await self.message.edit(view=self)
+        except Exception:
+            pass
+
+@tree.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.")
+async def guidebook(interaction: Interaction):
+    view = GuidebookView()
+    first_page = guide_pages[0]
+    embed = Embed(
+        title=first_page["title"],
+        description="📚 Navigate the divine pages of the Guidebook.",
+        color=0xD4AF37
+    )
+    embed.set_image(url=first_page["image"])
+    
+    response = await interaction.response.send_message(embed=embed, view=view)
+    view.message = await interaction.original_response()
 
 keep_alive()
 

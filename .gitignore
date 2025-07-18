@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+send_embed.py
 <<<<<<< HEAD
 *.py[codz]
 =======
