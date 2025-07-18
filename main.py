@@ -391,7 +391,7 @@ GOD_NAME_TO_PAGE = {
     if " - " in page["title"]
 }
 
-@bot.tree.command(name="viewfate", description="Flip through the Oracle’s guidebook.")
+@bot.tree.command(name="viewfate", description="Flip through the Oracle’s guidebook.", guild=discord.Object(id=GUILD_ID))
 @app_commands.describe(god="View another god’s card by name (e.g., olympus, zeus, poseidon, etc.)")
 async def viewfate(interaction: discord.Interaction, god: str = None):
     await interaction.response.defer(ephemeral=True)
