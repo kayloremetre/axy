@@ -434,7 +434,7 @@ class GuidebookView(View):
             pass
 
 @tree.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.", guild=discord.Object(id=GUILD_ID))
-@app_commands.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.")
+@app_commands.describe(description="Reveal the sacred Guidebook to the Gods.")
 async def guidebook(interaction: Interaction):
     first_page = guide_pages[0]
     embed = Embed(
