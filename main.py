@@ -149,7 +149,6 @@ async def on_ready():
     await tree.sync(guild=discord.Object(id=GUILD_ID))
 
     bot.add_view(ClaimButton())
-    bot.add_view(GuidebookView())
     print("Persistent views registered")
 
 async def send_axy_intro(bot: discord.Client):
@@ -450,6 +449,7 @@ async def guidebook(interaction: Interaction):
     view = GuidebookView()
     await interaction.response.send_message(embed=embed, view=view)
     view.message = await interaction.original_response()
+
 keep_alive()
 
 if BOT_TOKEN is None:
