@@ -142,20 +142,6 @@ class ClaimButton(discord.ui.View):
         except discord.Forbidden:
             print(f"❌ Lacking permissions to delete thread {thread.name}.")
 
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user}')
-    await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-    
-    # Set custom activity
-    # await bot.change_presence(activity=discord.Game(name="🜸 Awaiting Bootcamp 12.0..."))
-    # Alternatives:
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="the Threads of Fate... 🔮"))
-    # await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="half-bloods arrive..."))
-    
-    bot.add_view(ClaimButton())
-    print("Persistent views registered")
-
 async def send_axy_intro(bot: discord.Client):
     channel = bot.get_channel(AXY_INTRO_CHANNEL)
     if not channel:
@@ -424,6 +410,16 @@ async def viewfate(interaction: discord.Interaction, god: str = None):
     embed = discord.Embed(title=page["title"], color=discord.Color.gold())
     embed.set_image(url=page["image"])
     await interaction.followup.send(embed=embed)
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user}')
+    synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+    print(f"🔧 Synced {len(synced)} slash commands to guild {GUILD_ID}")
+    await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="the Threads of Fate... 🔮"))
+    bot.add_view(ClaimButton())
+    print("Persistent views registered")
 
 keep_alive()
 
