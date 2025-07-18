@@ -366,7 +366,6 @@ async def consultaxy(interaction: discord.Interaction, question: str):
 
 # Example guidebook pages — update these with actual image URLs or file paths
 guide_pages = [
-    {"title": "📜 - Olympus", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593774540783767/2.png?ex=687b037c&is=6879b1fc&hm=4fb28f0ad5c5388941264ced741c8c322cfab026f21f464edd487ed13589f23e&=&format=webp&quality=lossless&width=1545&height=901"},
     {"title": "I - ⚡ Zeus", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593775350415401/3.png?ex=687b037c&is=6879b1fc&hm=c16a9e513ebf25af31a1311f5f92e800710d2f0444de499ec64e6b8028718a03&=&format=webp&quality=lossless&width=1031&height=902"},
     {"title": "II - 🌊 Poseidon", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593776235286568/4.png?ex=687b037d&is=6879b1fd&hm=075754ae31ea789b6c6ed79a76754233bb58f7b085555ef79d5a6dd0a4de7731&=&format=webp&quality=lossless&width=1031&height=902"},
     {"title": "III - 🔥 Hades", "image": "https://media.discordapp.net/attachments/1394946325161709699/1395593777208623104/5.png?ex=687b037d&is=6879b1fd&hm=c2b85934177e89ed1f418a6718d92a9484326039e025e58c5e80dc4be1c3f134&=&format=webp&quality=lossless&width=1031&height=902"},
