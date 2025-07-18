@@ -150,10 +150,6 @@ async def on_ready():
 
     bot.add_view(ClaimButton())
     print("Persistent views registered")
-    bot.add_view(GuidebookView())
-
-    # await send_axy_intro(bot)
-
 
 async def send_axy_intro(bot: discord.Client):
     channel = bot.get_channel(AXY_INTRO_CHANNEL)
@@ -437,9 +433,8 @@ class GuidebookView(View):
         except Exception:
             pass
 
-@tree.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.")
+@app_commands.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.")
 async def guidebook(interaction: Interaction):
-    view = GuidebookView(timeout=300)
     first_page = guide_pages[0]
     embed = Embed(
         title=first_page["title"],
@@ -447,10 +442,10 @@ async def guidebook(interaction: Interaction):
         color=0xD4AF37
     )
     embed.set_image(url=first_page["image"])
-    
-    response = await interaction.response.send_message(embed=embed, view=view)
-    view.message = await interaction.original_response()
 
+    view = GuidebookView()
+    await interaction.response.send_message(embed=embed, view=view)
+    view.message = await interaction.original_response()
 keep_alive()
 
 if BOT_TOKEN is None:
