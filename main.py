@@ -433,8 +433,6 @@ class GuidebookView(View):
     async def first(self, interaction: Interaction, button: Button):
         self.page = 0
         await self.update_embed(interaction)
-        await self.disable_all(interaction)
-
 
 @bot.tree.command(name="guidebook", description="Reveal the sacred Guidebook to the Gods.", guild=discord.Object(id=GUILD_ID))
 async def guidebook(interaction: Interaction):
