@@ -419,9 +419,9 @@ async def viewfate(interaction: discord.Interaction, god: str = None):
 @bot.event
 async def on_ready():
     logging.info(f'Logged in as {bot.user}')
-    synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-    logging.info(f"🔧 Synced {len(synced)} slash commands to guild {GUILD_ID}")
-    await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+    # synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+    # logging.info(f"🔧 Synced {len(synced)} slash commands to guild {GUILD_ID}")
+    # await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="the Threads of Fate... 🔮"))
     bot.add_view(ClaimButton())
     logging.info("Persistent views registered")
