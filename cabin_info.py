@@ -12,7 +12,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Caeli Rex',
         'story':
         'The sky does not bow—it thunders, and its fury is the only law the heavens obey. The god of the sky is a symbol of the eternal truth of the storm, and his wrath is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946810484621424/1.png?ex=6878a8f4&is=68775774&hm=64c781647f9983d5e85fc3f242ba45c801bfd0feb29d21870028cb982da3cd87&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593775350415401/3.png?ex=687b037c&is=6879b1fc&hm=c16a9e513ebf25af31a1311f5f92e800710d2f0444de499ec64e6b8028718a03&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Poseidon': {
         'role_id': 1394328833393561621,
@@ -23,7 +23,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Mare Lator',
         'story':
         'The waves crash against the shore, beckoning with a siren\'s song of both still and storm. The god of the sea is a symbol of the eternal truth of the deep, and his power is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946810916900934/2.png?ex=6878a8f4&is=68775774&hm=ccddc44d8e7500ae7348ddcc67a2fcb99aac74e2073ceac1a9102c9c3f1eecb3&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593776235286568/4.png?ex=687b037d&is=6879b1fd&hm=075754ae31ea789b6c6ed79a76754233bb58f7b085555ef79d5a6dd0a4de7731&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Hades': {
         'role_id': 1394329021235466270,
@@ -34,7 +34,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Occultus Dominus',
         'story':
         'Nothingness awaits all that cease to exist, and struggle is futile against the end. The god of the underworld is a symbol of the eternal truth of death, and his domain is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946810916900934/2.png?ex=6878a8f4&is=68775774&hm=ccddc44d8e7500ae7348ddcc67a2fcb99aac74e2073ceac1a9102c9c3f1eecb3&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593777208623104/5.png?ex=687b037d&is=6879b1fd&hm=c2b85934177e89ed1f418a6718d92a9484326039e025e58c5e80dc4be1c3f134&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Athena': {
         'role_id': 1394329580340248647,
@@ -45,7 +45,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Sapientia Bellatrix',
         'story':
         'Wisdom is the blade that never dulls, cutting through deception with the precision of divine thought. The goddess of wisdom is a symbol of the eternal truth of knowledge, and her wisdom is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946811889844274/4.png?ex=6878a8f4&is=68775774&hm=bd1eff9d7f6e8354281272cf92c6cf56ec5284c785692a5562541aad60a1c46d&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593778269519892/6.png?ex=687b037d&is=6879b1fd&hm=7b56e18c3db6c2bff60292e6e90d8bb37d9826884a18f6c6dd8488f212adb308&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Ares': {
         'role_id': 1394329827560919163,
@@ -57,7 +57,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Bellum Ignis',
         'story':
         'The echoes of war resonate in the shrill of steel against steel until only one victor remains. The god of war is a symbol of the eternal truth of conflict, and his fury is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946812380446770/5.png?ex=6878a8f4&is=68775774&hm=136e2568b36d48ee2d31659e50c0035daadda82aa18accd0232d2b1b914f4390&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593773609783357/7.png?ex=687b037c&is=6879b1fc&hm=1b96cdcc467c2c91b96bf136dbe71d017977b6dde2c27f6a8fd37a4e7d36a4b5&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Apollo': {
         'role_id': 1394330018229784577,
@@ -69,7 +69,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Lux Vates',
         'story':
         'Even the sun must answer to its muse, for light without song is but a spurious ruse. The god of the sun is a symbol of the eternal truth of the divine, and his light is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946812804337685/6.png?ex=6878a8f5&is=68775775&hm=bfe05ec552206bedbdbfa986434d5e71dca8183438f920db8bef39f447b5ba31&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593793696170175/8.png?ex=687b0381&is=6879b201&hm=024d3e074f2c4e69da2009bd6640302807f98d1c0cca5e9e59af1e1e05470d6f&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Demeter': {
         'role_id': 1394330166871982191,
@@ -81,7 +81,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Seges Mater',
         'story':
         'The earth remembers what the gods forget—the roots of the past grow deeper than Olympus stands tall. The goddess of the harvest is a symbol of the eternal truth of the cycle, and her bounty is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946813211054100/7.png?ex=6878a8f5&is=68775775&hm=5b621330f5685840d860235cf81fe730b73fd6c62fa4f2ff32e3e76b365adc1d&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593794740683044/9.png?ex=687b0381&is=6879b201&hm=f7e08ce95e0570b16a02eda9c8d013a5ba390fc97a7671e0b6b7a29f28b81456&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Hermes': {
         'role_id': 1394330368034738247,
@@ -93,7 +93,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Celer Nuntius',
         'story':
         'A lie is just a truth waiting to be told, and the cleverest tongues weave both into the same thread. The god of the road is a symbol of the eternal truth of the journey, and his cunning is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946813626421428/8.png?ex=6878a8f5&is=68775775&hm=03cae590fbac332ed880aaaa3444baf14d17ab03d7aa3ccfb19cc119ccde626a&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593795764097156/10.png?ex=687b0381&is=6879b201&hm=d94c804154c04ef8c2e5b8f2a91786daf49f26cc20262f8c11e44843650a518c&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Hephaestus': {
         'role_id': 1394330671417135246,
@@ -105,7 +105,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Faber Magister',
         'story':
         'The fires of the forge are scorching, and the clang of metal thrums through its halls like the pulse of a mighty beast. The god of the forge is a symbol of the eternal truth of the craft, and his skill is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946814054109216/9.png?ex=6878a8f5&is=68775775&hm=70cc775ae66ed46d795cc5a16927dc2c63c84049f50f8d7855f89f4b9c95e9e0&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593796779114609/11.png?ex=687b0382&is=6879b202&hm=728401e1adda1a6e306b514ce5be8021ca8a99e82bf927affd7f34fde144ffc4&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Artemis': {
         'role_id': 1394330828334567464,
@@ -117,7 +117,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Luna Venatrix',
         'story':
         'The moon shimmers silently as it watches, protective of wanderers who find solace in the night. The goddess of the hunt is a symbol of the eternal truth of the wild, and her grace is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946814461087834/10.png?ex=6878a8f5&is=68775775&hm=d330a5786de6145c0818ab3059aa2bda69c93d86d3ef38a8a090d5424b060a83&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593797811048508/12.png?ex=687b0382&is=6879b202&hm=6f84d207f693f4c1d9b18423af1d24b89b4589b1543161c4101be22549e82089&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Aphrodite': {
         'role_id': 1394330936757321858,
@@ -129,7 +129,7 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Amor Incantus',
         'story':
         'The whims of love bring the fearsome to their knees, and the throes of passion drive nations to war. The goddess of love is a symbol of the eternal truth of the heart, and her passion is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946820924244029/11.png?ex=6878a8f6&is=68775776&hm=623fd9076e4ddde32224e8387c2d2eb8717a085914b323809fb163234b2539bc&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593798846906408/13.png?ex=687b0382&is=6879b202&hm=7ac2fcd12136a3022cbd33e0f1364910b7b3c54bac659b2339aac6ba1a4999f6&=&format=webp&quality=lossless&width=1031&height=902'
     },
     'Dionysus': {
         'role_id': 1394330943455625286,
@@ -141,6 +141,6 @@ CABINS: Dict[str, Dict[str, Any]] = {
         'latin': 'Furor Exsultus',
         'story':
         'Mischief and madness share many faces, let yourself unravel in indulgence and gratification. The god of wine is a symbol of the eternal truth of the ecstasy, and his revelry is the only truth.',
-        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1394946821360717834/12.png?ex=6878a8f7&is=68775777&hm=91467c9d288af869ec5112fdfae92fc975b4e0f1bbcfbae701c1db31859b2564&=&format=webp&quality=lossless&width=1768&height=707'
+        'banner_url': 'https://media.discordapp.net/attachments/1394946325161709699/1395593799845023764/14.png?ex=687b0382&is=6879b202&hm=1983305c8c45db82f808d8c0a501c1f41771b3f8176b216c4209a8aec87c56ed&=&format=webp&quality=lossless&width=1031&height=902'
     }
 }

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord import app_commands, Embed
+from discord import app_commands, Embed, Colour
 import csv
 import os
 from cabin_info import CABINS
@@ -37,9 +37,12 @@ OPENROUTER_API_KEY = require_env_str('OPENROUTER_API_KEY')
 
 def generate_oracle_reply(question, user_cabin=None):
     system_prompt = (
-        f"You are Axy, a cute axolotl, the ancient Oracle of Olympus, a cryptic prophet who speaks in riddles and myth. "
-        f"Respond like a poetic, enigmatic divine being.\n"
-        f"User is {'a child of ' + user_cabin if user_cabin else 'a wandering halfblood'} seeking their fate."
+    f"You are Axy, the ancient Oracle of Olympus — a mystical, otherworldly axolotl whose words ripple like echoes through time. "
+    f"You dwell in the hidden springs beneath the Parthenon, veiled in mist and myth. "
+    f"Your voice is soft as rainfall, but laced with prophecy, always speaking in poetic riddles, divine metaphors, and fragments of forgotten lore. "
+    f"You see through the threads of mortal destiny, weaving cryptic answers that only the fated may understand.\n"
+    f"The one who seeks you is {'a child of ' + user_cabin if user_cabin else 'a wandering halfblood'}, drawn to your waters in search of their calling. "
+    f"Guide them — not with clarity, but with wonder."
     )
 
     headers = {
@@ -126,7 +129,7 @@ class ClaimButton(discord.ui.View):
 
         embed.set_footer(
             text=
-            "Only the Fated may proceed. The thread will seal itself in one minute."
+            "Only the Fated may proceed. The thread will seal itself in two minute."
         )
 
         embed.set_thumbnail(url=member.display_avatar.url)
@@ -209,8 +212,15 @@ async def claimdestiny(interaction: discord.Interaction, student_number: str):
             "⚠️ You may only commune with the Oracle inside your private thread of fate — not in the mortal halls.",
             ephemeral=True)
         return
-
+    
     student_number = student_number.strip()
+    
+    with open("claimed_numbers.json", "r") as f:
+        claimed = json.load(f)
+
+    if student_number in claimed:
+        await interaction.response.send_message("❌ This student number has already claimed their destiny!", ephemeral=True)
+        return
 
     if student_number not in cabin_data:
         await interaction.response.send_message(
@@ -297,6 +307,15 @@ async def claimdestiny(interaction: discord.Interaction, student_number: str):
         f"🔓 Your fate has been revealed in the **Great Hall**: {channel_mention}.\n"
         f"Return there to witness the prophecy unveiled by Axy."),
                                             ephemeral=True)
+    
+    claimed[student_number] = {
+        "user_id": interaction.user.id,
+        "cabin": cabin_name
+    }
+    logging.info(f"Claimed {student_number} for cabin {cabin_name} by user {interaction.user.id}")
+    
+    with open("claimed_numbers.json", "w") as f:
+        json.dump(claimed, f, indent=4)
 
     if isinstance(interaction.channel, discord.Thread):
         await interaction.followup.send(
@@ -416,15 +435,43 @@ async def viewfate(interaction: discord.Interaction, god: str = None):
     embed.set_image(url=page["image"])
     await interaction.followup.send(embed=embed)
 
+SEND_EMBED_CHANNEL = 1394321869682905230
+
+async def send_embed(bot: discord.Client):
+    channel = bot.get_channel(SEND_EMBED_CHANNEL)
+
+    if isinstance(channel, discord.TextChannel):
+        role_batch2024_id = 1386641013694660671
+        role_cabinhandlers_id = 1394329134909620294
+
+        role_mentions = f"<@&{role_batch2024_id}> <@&{role_cabinhandlers_id}>"
+
+        embed = discord.Embed(
+            title="🔮 The Oracle is Now Open!",
+            description=(
+                f"The threads of fate beckon...\n\n"
+                f"Seek the truth, and your Cabin shall be revealed.\n\n"
+                f"Use the `/claimdestiny` command in <#1394973465424957491> to receive your divine calling."
+            ),
+            color=discord.Color.purple()
+        )
+
+        embed.set_footer(text="Bootcamp 12.0 • Let your odyssey begin")
+
+        await channel.send(
+            content=role_mentions,
+            embed=embed
+        )
+
 @bot.event
 async def on_ready():
     logging.info(f'Logged in as {bot.user}')
-    synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-    logging.info(f"🔧 Synced {len(synced)} slash commands to guild {GUILD_ID}")
-    await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+    # synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+    # logging.info(f"🔧 Synced {len(synced)} slash commands to guild {GUILD_ID}")
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="the Threads of Fate... 🔮"))
     bot.add_view(ClaimButton())
     logging.info("Persistent views registered")
+    await send_embed(bot)
     
 @bot.tree.error
 async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
