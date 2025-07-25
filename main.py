@@ -435,34 +435,6 @@ async def viewfate(interaction: discord.Interaction, god: str = None):
     embed.set_image(url=page["image"])
     await interaction.followup.send(embed=embed)
 
-SEND_EMBED_CHANNEL = 1394321869682905230
-
-async def send_embed(bot: discord.Client):
-    channel = bot.get_channel(SEND_EMBED_CHANNEL)
-
-    if isinstance(channel, discord.TextChannel):
-        role_batch2024_id = 1386641013694660671
-        role_cabinhandlers_id = 1394329134909620294
-
-        role_mentions = f"<@&{role_batch2024_id}> <@&{role_cabinhandlers_id}>"
-
-        embed = discord.Embed(
-            title="🔮 The Oracle is Now Open!",
-            description=(
-                f"The threads of fate beckon...\n\n"
-                f"Seek the truth, and your Cabin shall be revealed.\n\n"
-                f"Use the `/claimdestiny` command in <#1394973465424957491> to receive your divine calling."
-            ),
-            color=discord.Color.purple()
-        )
-
-        embed.set_footer(text="Bootcamp 12.0 • Let your odyssey begin")
-
-        await channel.send(
-            content=role_mentions,
-            embed=embed
-        )
-
 @bot.event
 async def on_ready():
     logging.info(f'Logged in as {bot.user}')
@@ -471,7 +443,6 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="the Threads of Fate... 🔮"))
     bot.add_view(ClaimButton())
     logging.info("Persistent views registered")
-    await send_embed(bot)
     
 @bot.tree.error
 async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
